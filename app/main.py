@@ -6,8 +6,10 @@ from pydantic import BaseModel
 from app.classify import classify_amounts
 from app.normalize import normalize_amounts
 from app.ocr import extract_tokens
+from app.pipeline import run_pipeline
 from app.schemas import (
     ClassificationResult,
+    FinalOutput,
     GuardrailResponse,
     NormalizedResult,
     OCRResult,
@@ -47,3 +49,8 @@ def classify_text(body: TextInput):
     if isinstance(step2, GuardrailResponse):
         return step2
     return classify_amounts(step1, step2)
+
+
+@app.post("/extract/text", response_model=Union[FinalOutput, GuardrailResponse])
+def extract_text(body: TextInput):
+    return run_pipeline(body.text)

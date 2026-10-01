@@ -12,10 +12,10 @@ class OCRResult(BaseModel):
 
 # ---------- Step 2: Normalization ----------
 class NormalizedToken(BaseModel):
-    raw: str                      # token as Step 1 found it, e.g. "l200"
-    value: float                  # parsed number, e.g. 1200.0
+    raw: str
+    value: float
     is_percent: bool = False
-    corrected: bool = False       # True if we had to fix OCR characters
+    corrected: bool = False
 
 
 class NormalizedResult(BaseModel):
@@ -32,7 +32,7 @@ AmountType = Literal["total_bill", "paid", "due", "discount", "subtotal", "tax",
 class ClassifiedAmount(BaseModel):
     type: AmountType
     value: float
-    source: str = ""   # e.g. "Total: INR 1200"
+    source: str = ""
 
 
 class ClassificationResult(BaseModel):
@@ -44,13 +44,15 @@ class ClassificationResult(BaseModel):
 class FinalAmount(BaseModel):
     type: AmountType
     value: float
-    source: str  # e.g. "text: 'Total: INR 1200'"
+    source: str
 
 
 class FinalOutput(BaseModel):
     currency: Optional[str] = None
     amounts: List[FinalAmount]
     status: Literal["ok", "needs_review"] = "ok"
+    confidence: float = Field(ge=0.0, le=1.0)
+    warnings: List[str] = []
 
 
 # ---------- Guardrail / error response ----------
