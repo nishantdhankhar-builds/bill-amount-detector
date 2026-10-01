@@ -11,8 +11,17 @@ class OCRResult(BaseModel):
 
 
 # ---------- Step 2: Normalization ----------
+class NormalizedToken(BaseModel):
+    raw: str                      # token as Step 1 found it, e.g. "l200"
+    value: float                  # parsed number, e.g. 1200.0
+    is_percent: bool = False
+    corrected: bool = False       # True if we had to fix OCR characters
+
+
 class NormalizedResult(BaseModel):
     normalized_amounts: List[float]
+    percentages: List[float] = []
+    tokens: List[NormalizedToken] = []
     normalization_confidence: float = Field(ge=0.0, le=1.0)
 
 
