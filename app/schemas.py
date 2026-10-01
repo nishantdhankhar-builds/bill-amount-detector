@@ -33,6 +33,7 @@ class ClassifiedAmount(BaseModel):
     type: AmountType
     value: float
     source: str = ""
+    raw_source: str = ""
 
 
 class ClassificationResult(BaseModel):
@@ -45,6 +46,7 @@ class FinalAmount(BaseModel):
     type: AmountType
     value: float
     source: str
+    raw_source: Optional[str] = None
 
 
 class FinalOutput(BaseModel):

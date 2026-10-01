@@ -29,3 +29,11 @@ def test_arithmetic_mismatch_needs_review():
 
 def test_guardrail_passthrough():
     assert isinstance(run_pipeline("hello"), GuardrailResponse)
+
+
+def test_at_sign_misread_as_zero():
+    r = run_pipeline("Total: INR 12@@ | Paid: 10@@ | Due: 20@ | Discount: 10%")
+    assert isinstance(r, FinalOutput)
+    assert [(a.type, a.value) for a in r.amounts] == [
+        ("total_bill", 1200), ("paid", 1000), ("due", 200)
+    ]

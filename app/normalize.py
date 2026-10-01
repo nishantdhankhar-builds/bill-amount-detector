@@ -9,7 +9,7 @@ from app.schemas import (
 )
 
 # Letters OCR often confuses with digits
-DIGIT_FIXES = {"O": "0", "o": "0", "I": "1", "l": "1", "S": "5", "B": "8"}
+DIGIT_FIXES = {"O": "0", "o": "0", "I": "1", "l": "1", "S": "5", "B": "8", "@": "0"}
 
 BASE_CONFIDENCE = 0.95
 CORRECTION_PENALTY = 0.20   # max reduction when every token needed fixing

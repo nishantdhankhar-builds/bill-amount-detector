@@ -88,9 +88,22 @@ def classify_amounts(
             amount_type, score = match_label(after)
 
         prev_end = end
-        source = text[start:end].strip(" \t") or tok.raw
+
+        # raw_source = exactly what was read; source = same snippet with the number corrected
+        raw_source = text[start:end].strip(" \t") or tok.raw
+        clean_value = str(int(tok.value)) if tok.value.is_integer() else str(tok.value)
+        if raw_source.endswith(tok.raw):
+            source = raw_source[: len(raw_source) - len(tok.raw)] + clean_value
+        else:
+            source = raw_source
+
         labeled.append(
-            ClassifiedAmount(type=amount_type or "other", value=tok.value, source=source)
+            ClassifiedAmount(
+                type=amount_type or "other",
+                value=tok.value,
+                source=source,
+                raw_source=raw_source,
+            )
         )
         scores.append(score)
 

@@ -2,7 +2,7 @@ from typing import Dict, List, Union
 
 from app.classify import classify_amounts
 from app.normalize import normalize_amounts
-from app.ocr import extract_tokens
+from app.ocr import extract_tokens, image_to_text
 from app.schemas import (
     ClassifiedAmount,
     ClassificationResult,
@@ -47,7 +47,12 @@ def build_final_output(
         warnings.append(f"low confidence ({classified.confidence})")
 
     amounts = [
-        FinalAmount(type=a.type, value=a.value, source=f"{source_kind}: '{a.source}'")
+        FinalAmount(
+            type=a.type,
+            value=a.value,
+            source=f"{source_kind}: '{a.source}'",
+            raw_source=a.raw_source if a.raw_source != a.source else None,
+        )
         for a in classified.amounts
     ]
     return FinalOutput(
@@ -76,3 +81,12 @@ def run_pipeline(
         return step3
 
     return build_final_output(step1, step3, source_kind)
+
+
+def run_image_pipeline(image_bytes: bytes) -> Union[FinalOutput, GuardrailResponse]:
+    """OCR an image, then run the same Steps 1-4 on the text it contains."""
+    result = image_to_text(image_bytes)
+    if isinstance(result, GuardrailResponse):
+        return result
+    text, ocr_confidence = result
+    return run_pipeline(text, source_kind="ocr", ocr_confidence=ocr_confidence)
