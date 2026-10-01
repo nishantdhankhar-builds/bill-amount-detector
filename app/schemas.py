@@ -28,9 +28,12 @@ class NormalizedResult(BaseModel):
 # ---------- Step 3: Classification ----------
 AmountType = Literal["total_bill", "paid", "due", "discount", "subtotal", "tax", "other"]
 
+
 class ClassifiedAmount(BaseModel):
     type: AmountType
     value: float
+    source: str = ""   # e.g. "Total: INR 1200"
+
 
 class ClassificationResult(BaseModel):
     amounts: List[ClassifiedAmount]
@@ -42,6 +45,7 @@ class FinalAmount(BaseModel):
     type: AmountType
     value: float
     source: str  # e.g. "text: 'Total: INR 1200'"
+
 
 class FinalOutput(BaseModel):
     currency: Optional[str] = None
