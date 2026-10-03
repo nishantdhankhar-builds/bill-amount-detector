@@ -27,6 +27,7 @@ class NormalizedResult(BaseModel):
 
 # ---------- Step 3: Classification ----------
 AmountType = Literal["total_bill", "paid", "due", "discount", "subtotal", "tax", "other"]
+LabelMethod = Literal["rules", "llm"]
 
 
 class ClassifiedAmount(BaseModel):
@@ -34,6 +35,7 @@ class ClassifiedAmount(BaseModel):
     value: float
     source: str = ""
     raw_source: str = ""
+    labeled_by: LabelMethod = "rules"
 
 
 class ClassificationResult(BaseModel):
@@ -47,6 +49,7 @@ class FinalAmount(BaseModel):
     value: float
     source: str
     raw_source: Optional[str] = None
+    labeled_by: LabelMethod = "rules"
 
 
 class FinalOutput(BaseModel):

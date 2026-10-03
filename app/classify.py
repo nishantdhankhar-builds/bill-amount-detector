@@ -2,6 +2,7 @@ import difflib
 import re
 from typing import List, Optional, Tuple, Union
 
+from app.llm import llm_label_tokens
 from app.schemas import (
     ClassificationResult,
     ClassifiedAmount,
@@ -22,6 +23,7 @@ KEYWORDS = {
 
 EXACT_SCORE = 1.0
 FUZZY_SCORE = 0.85       # label needed OCR-tolerant matching
+LLM_SCORE = 0.70         # label suggested by the LLM fallback
 UNLABELED_SCORE = 0.40   # no keyword found
 FUZZY_CUTOFF = 0.70      # how similar a word must be to a keyword
 
@@ -106,6 +108,20 @@ def classify_amounts(
             )
         )
         scores.append(score)
+
+    # LLM fallback: only for amounts the rules could not label.
+    # The LLM returns labels by index, so it can never add or change a value.
+    unlabeled = [i for i, a in enumerate(labeled) if a.type == "other"]
+    if unlabeled:
+        items = [(i, a.raw_source, a.value) for i, a in enumerate(labeled)]
+        suggestions = llm_label_tokens(text, items)
+        for i in unlabeled:
+            new_type = suggestions.get(i)
+            if new_type and new_type != "other":
+                labeled[i] = labeled[i].model_copy(
+                    update={"type": new_type, "labeled_by": "llm"}
+                )
+                scores[i] = LLM_SCORE
 
     if not labeled or all(a.type == "other" for a in labeled):
         return GuardrailResponse(

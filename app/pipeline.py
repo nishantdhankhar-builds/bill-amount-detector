@@ -52,6 +52,7 @@ def build_final_output(
             value=a.value,
             source=f"{source_kind}: '{a.source}'",
             raw_source=a.raw_source if a.raw_source != a.source else None,
+            labeled_by=a.labeled_by,
         )
         for a in classified.amounts
     ]
